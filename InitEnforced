@@ -1,0 +1,75 @@
+
+#!/bin/bash
+#Disk Boost for a really slow hdd
+
+
+Initialparameter(){
+echo Loading Environment Variables
+export DISPLAY=:1
+export PULSE_SERVER=127.0.0.1
+export LIBGL_ALWAYS_INDIRECT=0 # Please change this if the driver already mature enough
+
+}
+
+flaggingprocess(){
+# use /dev/shm
+mkdir /bootflag
+#mount -t tmpfs tmpfs /bootflag
+mkdir /dev/shm/bootflag
+ln -s /dev/shm/bootflag /
+echo on > /bootflag/on
+
+}
+
+sysctl -p #please copy the sysctl.conf
+export LD_PRELOAD=eatmydata
+echo Welcome to the Wierdest Computer ever
+echo Checking Updates
+userpackage(){
+pacman -Syu fish xfce4 gparted nautilus lxqt metacity gnome --noconfirm --needed # for updating
+packagelist=$(cat /userpackage)
+for a in $packagelist ; do
+echo ${a}
+pacman -S ${a} --noconfirm --needed
+done
+}
+basicservices(){
+#nohup /mnt/c/pulseaudio/bin/pulseaudio.exe &
+#nohup sudo -u questandachievement7 syncthing & #for syncronizing
+}
+
+linuxdesktopfuse(){
+vncserver -kill :1
+ vncserver :1 -geometry 1280x720 -CompareFB -ImprovedHextile -SecurityTypes None -ZlibLevel=9 -shmem +iglx +bs +xinerama
+sleep 4
+sudo -u questandachievement7 dbus-launch xfce4-panel & 
+sudo -u questandachievement7 dbus-launch metacity &
+}
+
+
+if [ ! -f /bootflag/on ] ;then
+Initialparameter
+preload > /preload.log 2>&1 &
+userpackage > /installLogs 2>&1 &
+basicservices &
+linuxdesktopfuse &
+flaggingprocess
+fi
+Initialparameter
+#echo Loading Environment Variables
+#export DISPLAY=:0
+#export PULSE_SERVER=127.0.0.1
+#export LIBGL_ALWAYS_INDIRECT=1 # Please change this if the driver already mature enough
+rm -f nohup.out
+reset
+clear
+hostname theharmony7-PPC
+sessionlock(){
+while true ; do
+dialog --infobox 'myPPPC setup has been booted up please connect through \n\n\n\n\n\n vnc 127.0.0.1 port 5900' 10 50
+sleep 1
+done
+}
+sessionlock
+
+
